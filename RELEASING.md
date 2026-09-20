@@ -63,6 +63,20 @@ There is no rollback. Fix it and publish a **higher** version — 0.3.1 — as q
 took the bad one gets the fix through the same update prompt. (You can un-publish the bad release so nobody new
 downloads it, but copies that already updated stay where they are until the next version.)
 
+## Verified working — 2026-09-20
+
+The whole path was tested for real: 0.3.0 installed from its published release, 0.3.1 published, and the update
+taken from inside the app. What happened:
+
+- The badge and offer appeared; nothing moved until the button was pressed.
+- **No SmartScreen prompt during the in-app update**, even though the installer is unsigned. The updater fetches
+  the file itself, so it doesn't carry the "downloaded from the internet" mark that triggers the warning. The
+  warning only applies to the *first* manual install.
+- It installed **over** the existing copy — one entry in Windows' installed-apps list, same install location,
+  no uninstall step needed.
+- The applied shell, settings and downloaded models all survived, and the Ghost came back on its own.
+- The changelog notes read fine in the update card.
+
 ## How updating behaves, and why
 
 Deliberately opt-in at every step:

@@ -52,6 +52,10 @@ The app is now on GitHub — **https://github.com/sickontuesdays/deskghost** (pu
 * **The signing key is the thing that must not be lost:** `%USERPROFILE%\.tauri\deskghost.key` plus its
   password file, and the same pair as GitHub Actions secrets. Lose it and no installed copy can ever be updated
   again. Full detail in `RELEASING.md`.
+* **Verified end to end on 2026-09-20**: 0.3.0 installed, 0.3.1 published, update taken from inside the app —
+  no SmartScreen prompt during the in-app update, installed in place over the old copy, shell/settings/downloads
+  all survived. First *manual* install still shows the unsigned-app warning; that is expected and unfixed by
+  choice (no code-signing certificate).
 * `reference/` (the verbatim website snapshot) is gitignored — it isn't needed to build. `src/ghost/` is public.
 
 
