@@ -22,6 +22,14 @@ Cache locations:
 - Item list: `%APPDATA%\com.sickontuesdays.deskghost\catalog.json`
 - Downloaded files: `%LOCALAPPDATA%\com.sickontuesdays.deskghost\bungie\`
 
+## Updates
+
+Installed copies update themselves from GitHub Releases, but only when the user says so: DeskGhost checks on
+start (switchable off in Settings), raises an "Update available" badge, and downloads nothing until the button
+is pressed. Every release is signed and the signature is verified before anything installs.
+
+Cutting a release, and how the signing key is handled, is in **[RELEASING.md](RELEASING.md)**.
+
 ## Layout
 
 ```

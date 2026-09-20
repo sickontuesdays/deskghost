@@ -41,6 +41,20 @@ version: our flames have the right colour but the wrong *motion*. In game they s
 and the crystal has its own cloudy pattern drifting inside it — which suggests the under-glow texture we added
 behind the flames may actually belong on the crystal instead.
 
+## Update channel (added 2026-09-20)
+
+The app is now on GitHub — **https://github.com/sickontuesdays/deskghost** (public) — and can update itself.
+
+* Opt-in by design: it checks on start (switchable off), raises a badge, and installs nothing until the user
+  presses **Download and install**. About & Terms has an Updates section covering what a check sends.
+* Releases are cut by tagging `vX.Y.Z`; the Release workflow builds on a Windows runner, signs, and opens a
+  **draft** release. Publishing the draft is what ships the update.
+* **The signing key is the thing that must not be lost:** `%USERPROFILE%\.tauri\deskghost.key` plus its
+  password file, and the same pair as GitHub Actions secrets. Lose it and no installed copy can ever be updated
+  again. Full detail in `RELEASING.md`.
+* `reference/` (the verbatim website snapshot) is gitignored — it isn't needed to build. `src/ghost/` is public.
+
+
 ## Next session, in order
 
 1. Check which mesh part each texture is bound to on Blazing Conqueror (is `cloudy_swirl` the crystal's?).
