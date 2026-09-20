@@ -40,6 +40,19 @@ jobs:
 
       - run: npm ci
 
+      # The notes end up in latest.json, which is what the in-app update card shows — so they come from the
+      # CHANGELOG's top section rather than a fixed sentence. Editing the draft release afterwards does NOT
+      # change them: latest.json is written here, at build time.
+      - name: Read the newest CHANGELOG section
+        id: notes
+        shell: bash
+        run: |
+          {
+            echo 'body<<CHANGELOG_EOF'
+            awk '/^## /{ if (n++) exit; next } n { print }' CHANGELOG.md
+            echo CHANGELOG_EOF
+          } >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +61,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: DeskGhost ${{ github.ref_name }}
-          releaseBody: 'See CHANGELOG.md for what changed. Download the .exe below and run it.'
+          releaseBody: ${{ steps.notes.outputs.body }}
           releaseDraft: true
           prerelease: false
           # writes latest.json next to the installer — this is the file installed copies read

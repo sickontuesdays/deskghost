@@ -40,7 +40,9 @@ key; anyone who doesn't is stranded, so don't lose it in the first place.
    - `package.json`
    - `src-tauri/tauri.conf.json`
    - `src-tauri/Cargo.toml`
-2. Write the release notes in `CHANGELOG.md`. What goes in there is what users read; keep it in plain language.
+2. Write the release notes in `CHANGELOG.md`. The workflow copies that top section into `latest.json`, so it is
+   **literally what people read in the update card inside the app** — keep it plain-language. Editing the draft
+   release's text on GitHub afterwards does *not* change it; `latest.json` is written at build time.
 3. Commit, then tag and push:
    ```bash
    git commit -am "0.3.0"
