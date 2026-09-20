@@ -1,0 +1,13 @@
+node_modules/
+src-tauri/target/
+src-tauri/gen/
+
+# Never commit signing material. The updater private key lives in ~/.tauri/ (outside this folder) and in
+# GitHub Actions secrets — these patterns are a second line of defence in case one is ever copied in here.
+*.key
+*.key.password.txt
+.tauri/
+
+# Local verbatim snapshot of the website's js/ghost files, kept only for diffing when the site changes.
+# Not needed to build; src/ghost/ holds the ported versions that actually ship.
+reference/

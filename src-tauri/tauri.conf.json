@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DeskGhost",
+  "version": "0.3.0",
+  "identifier": "com.sickontuesdays.deskghost",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' http://bungie.localhost data: blob:",
+        "connect-src": "'self' ipc: http://ipc.localhost http://bungie.localhost",
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "form-action": "'none'",
+        "frame-src": "'none'"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": ["https://github.com/sickontuesdays/deskghost/releases/latest/download/latest.json"],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVCNzU4MkNBMUIyMjk5RkIKUldUN21TSWJ5b0oxNjhlOTlydEM1RnlvcGwveEdMRFdKb3V5T0MvWngzVnZQYUU0elVCNzZ1YkkK",
+      "windows": { "installMode": "passive" }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "shortDescription": "A Destiny 2 Ghost for your desktop",
+    "longDescription": "Pick any Destiny 2 Ghost shell and shader and it floats around your Windows desktop. Shell data is downloaded from Bungie's public content servers on demand and cached locally.",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "./windows/hooks.nsh"
+      }
+    }
+  }
+}

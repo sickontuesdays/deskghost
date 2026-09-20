@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DeskGhost</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand"><img src="brand.png" alt=""><span>DeskGhost</span></div>
+    <nav class="tabs" id="tabs" hidden>
+      <button data-tab="ghost" class="on">Ghost</button>
+      <button data-tab="settings">Settings</button>
+      <button data-tab="about">About &amp; Terms</button>
+    </nav>
+    <div class="status" id="status" hidden></div>
+    <!-- only appears once a check has found a newer version; clicking goes to the Updates card -->
+    <button class="updatebadge" id="update-badge" hidden>Update available</button>
+    <!-- external links: deliberately on the far right, styled as buttons, so they don't read as app tabs -->
+    <div class="headlinks" id="headlinks">
+      <button class="linkbtn sm" data-link="https://www.sickontuesdays.com" title="Open sickontuesdays.com in your browser">Website <span class="ext">↗</span></button>
+      <button class="linkbtn sm" data-link="https://discord.gg/RHqRfumhrz" title="Open the clan Discord invite in your browser">Discord <span class="ext">↗</span></button>
+    </div>
+  </header>
+
+  <!-- first run: build the catalog from Bungie's public manifest -->
+  <section id="setup" class="setup" hidden>
+    <div class="setup-card">
+      <img src="brand.png" alt="" class="setup-icon">
+      <h1>Getting DeskGhost ready</h1>
+      <p>DeskGhost downloads Bungie's public list of Ghost shells and shaders (about 45&nbsp;MB, one time), then the
+        icons so you can see what you're choosing. Each shell's 3D model downloads the first time you pick it and is
+        kept on this PC after that.</p>
+      <div class="progress"><div id="setup-bar"></div></div>
+      <div class="setup-msg" id="setup-msg">Starting…</div>
+      <button class="primary" id="setup-retry" hidden>Try again</button>
+    </div>
+  </section>
+
+  <!-- picker -->
+  <section id="ghost" class="picker" hidden>
+    <div class="browse">
+      <div class="filters">
+        <div class="seg" id="kind">
+          <button data-kind="shell" class="on">Shells <span id="count-shell"></span></button>
+          <button data-kind="shader">Shaders <span id="count-shader"></span></button>
+        </div>
+        <input id="search" type="search" placeholder="Search by name" autocomplete="off" spellcheck="false">
+        <select id="sort" title="Sort">
+          <option value="name">A–Z</option>
+          <option value="new">Newest first</option>
+          <option value="tier">Rarity</option>
+        </select>
+      </div>
+      <div class="chips" id="tiers"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <aside class="detail">
+      <div class="stage">
+        <canvas id="preview"></canvas>
+        <div class="stage-msg" id="stage-msg">Pick a shell to preview it</div>
+      </div>
+      <div class="pick">
+        <div class="pick-row">
+          <img id="pick-shell-icon" alt="">
+          <div>
+            <div class="pick-name" id="pick-shell-name">No shell picked</div>
+            <div class="pick-tier" id="pick-shell-tier"></div>
+          </div>
+        </div>
+        <div class="pick-row shader-row">
+          <img id="pick-shader-icon" alt="">
+          <div class="grow">
+            <div class="pick-label">Shader</div>
+            <div class="pick-name small" id="pick-shader-name">Default (no shader)</div>
+          </div>
+          <button class="ghostbtn" id="clear-shader" title="Use the shell's own colours" hidden>Remove</button>
+        </div>
+        <p class="flavor" id="pick-flavor"></p>
+        <button class="primary wide" id="apply" disabled>Put on desktop</button>
+        <button class="ghostbtn wide" id="power">Turn Ghost off</button>
+        <div class="hint" id="apply-hint">Drag the preview to turn it · double-click to spin again</div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- settings -->
+  <section id="settings" class="settings" hidden>
+    <div class="settings-inner">
+      <h2>Ghost</h2>
+      <div class="row">
+        <div><div class="label">Visibility</div><div class="sub">Wake on mouse: hides after a few seconds without mouse movement.</div></div>
+        <div class="seg" id="mode">
+          <button data-mode="always">Always</button>
+          <button data-mode="wake">Wake on mouse</button>
+          <button data-mode="off">Hidden</button>
+        </div>
+      </div>
+      <div class="row">
+        <div><div class="label">Size</div><div class="sub">On-screen size of the Ghost.</div></div>
+        <div class="slider"><input type="range" id="size" min="40" max="400" step="4"><output for="size"></output></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Slowest travel speed</div><div class="sub">Pixels per second.</div></div>
+        <div class="slider"><input type="range" id="minSpeed" min="20" max="600" step="10"><output for="minSpeed"></output></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Fastest travel speed</div><div class="sub">Pixels per second.</div></div>
+        <div class="slider"><input type="range" id="maxSpeed" min="40" max="1500" step="10"><output for="maxSpeed"></output></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Scan frequency</div><div class="sub">How often it stops to scan, out of every 15 idle moments.</div></div>
+        <div class="slider"><input type="range" id="scanRate" min="1" max="15" step="1"><output for="scanRate"></output></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Frame-rate cap</div><div class="sub">Lower uses less GPU. 30 is smooth for a small Ghost.</div></div>
+        <div class="slider"><input type="range" id="fps" min="10" max="60" step="5"><output for="fps"></output></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Display</div><div class="sub">Which monitor the Ghost lives on.</div></div>
+        <select id="monitor"></select>
+      </div>
+      <div class="row">
+        <div><div class="label">Hide during fullscreen games and videos</div><div class="sub">Steps aside whenever a fullscreen app is in front, so it never sits on top of a game.</div></div>
+        <label class="switch"><input type="checkbox" id="hideFullscreen"><span></span></label>
+      </div>
+
+      <h2>DeskGhost updates</h2>
+      <div class="row">
+        <div><div class="label">This copy of DeskGhost</div><div class="sub" id="update-sub">Checking version…</div></div>
+        <button class="ghostbtn" id="update-check">Check now</button>
+      </div>
+      <!-- an update is only ever offered here; nothing downloads or installs until the button below is pressed -->
+      <div class="update-card" id="update-card" hidden>
+        <div class="update-head"><b>DeskGhost <span id="update-ver"></span> is available</b></div>
+        <div class="update-notes" id="update-notes"></div>
+        <div class="btns">
+          <button class="primary" id="update-install">Download and install</button>
+          <button class="ghostbtn" id="update-later">Not now</button>
+        </div>
+        <div class="progress" id="update-prog" hidden><div id="update-bar"></div></div>
+        <div class="sub" id="update-msg"></div>
+      </div>
+      <div class="row">
+        <div><div class="label">Look for updates when DeskGhost starts</div><div class="sub">Only looks and tells you.
+          Nothing is ever downloaded or installed unless you press the button yourself.</div></div>
+        <label class="switch"><input type="checkbox" id="autoCheck"><span></span></label>
+      </div>
+
+      <h2>App</h2>
+      <div class="row">
+        <div><div class="label">Start with Windows</div><div class="sub">Launch DeskGhost in the tray when you sign in.</div></div>
+        <label class="switch"><input type="checkbox" id="autostart"><span></span></label>
+      </div>
+      <div class="row">
+        <div><div class="label">Downloaded files</div><div class="sub" id="cache-size">Measuring…</div></div>
+        <button class="ghostbtn" id="clear-cache">Clear downloaded models</button>
+      </div>
+      <div class="row">
+        <div><div class="label">Item list</div><div class="sub" id="catalog-info"></div></div>
+        <div class="btns">
+          <button class="ghostbtn" id="check-update">Check for new items</button>
+          <button class="ghostbtn" id="rebuild">Rebuild</button>
+        </div>
+      </div>
+      <p class="fineprint">Ghost shells, shaders and icons are downloaded from Bungie's public content servers
+        when you pick them and cached on this PC. DeskGhost isn't made by or affiliated with Bungie.</p>
+    </div>
+  </section>
+
+  <!-- about, game-safety information, and the terms this program is offered under -->
+  <section id="about" class="settings" hidden>
+    <div class="settings-inner doc">
+      <h1>DeskGhost <span class="ver" id="version"></span></h1>
+      <p class="lede">A Destiny 2 Ghost shell that floats around your Windows desktop. Made by Stephen Litzinger,
+        a member of the S!ck on Tuesdays! clan, for the Destiny 2 community. Free, non-commercial, and not
+        connected to Bungie in any way.</p>
+      <p class="links">
+        <button class="linkbtn" data-link="https://www.sickontuesdays.com">sickontuesdays.com <span class="ext">↗</span></button>
+        <button class="linkbtn" data-link="https://discord.gg/RHqRfumhrz">Join the clan Discord <span class="ext">↗</span></button>
+      </p>
+
+      <h2>How it works</h2>
+      <ul>
+        <li><b>It draws its own window.</b> The Ghost lives in a transparent, click-through window that Windows
+          places on top of your desktop. Mouse clicks pass straight through it to whatever is underneath.</li>
+        <li><b>It never touches other programs or games.</b> It does not load code into them, read their memory,
+          hook them, or send them input. It only asks Windows about window and monitor positions, reads your mouse
+          position, and shows or hides its own window.</li>
+        <li><b>Shells come from Bungie's public content servers.</b> On first run it downloads Bungie's public list
+          of Ghost shells and shaders; each shell's model and textures download the first time you pick it. All of
+          it is cached on your PC, so it works offline afterwards.</li>
+        <li><b>No account, no sign-in, no API key.</b> It cannot see your Destiny account, characters or inventory,
+          and it has no way to change anything in the game.</li>
+        <li><b>Nothing is collected or uploaded.</b> No telemetry, no analytics, no accounts. The only network
+          connections the program itself makes are downloading public files from bungie.net and, if you leave it
+          on, asking GitHub whether a newer version of DeskGhost exists. The Website and Discord buttons simply
+          hand that address to your normal browser — nothing about you goes with it.</li>
+      </ul>
+
+      <h2>Updates</h2>
+      <p>New versions are published on GitHub. DeskGhost can look for one when it starts, and if there is one it
+        shows an "Update available" badge and an offer in Settings.</p>
+      <ul>
+        <li><b>Nothing installs on its own.</b> A check only tells you. The new version is downloaded and
+          installed only when you press <b>Download and install</b> yourself, and you can ignore or dismiss the
+          offer for as long as you like.</li>
+        <li><b>You can turn checking off.</b> Settings → "Look for updates when DeskGhost starts". With it off,
+          DeskGhost never contacts the update server unless you press "Check now".</li>
+        <li><b>What a check sends.</b> A plain request for one small file listing the latest version. It carries
+          no account, no name and no identifier — nothing that says who you are. As with any web request, the
+          server it goes to (GitHub) can see the IP address it came from. Nothing is stored by us.</li>
+        <li><b>Every update is signed.</b> Each release is signed with a private key held by the author, and your
+          copy verifies that signature before installing anything. A download that has been tampered with, or
+          that came from anywhere else, is refused.</li>
+        <li><b>Your settings and downloaded shells are kept</b> across an update — you won't have to set it up or
+          re-download anything.</li>
+      </ul>
+
+      <h2>Games and anti-cheat</h2>
+      <p>Anti-cheat systems act against software that runs <i>inside</i> a game: injected code, hooks, memory
+        reading, automated input. DeskGhost does none of those things — it is an ordinary window, like a chat
+        window or a notification, and it gives you no information or advantage in any game.</p>
+      <ul>
+        <li><b>Destiny 2:</b> Bungie's published policy is that it will not ban or restrict players for using
+          common third-party applications such as Discord, OBS or RTSS, unless they are used to break Bungie's Code
+          of Conduct. BattlEye, Destiny 2's anti-cheat, states it bans for actual cheats and hacks, and that
+          non-cheat overlays are generally supported.</li>
+        <li><b>Other games:</b> the same distinction applies to Easy Anti-Cheat, Riot Vanguard and the rest — what
+          they block is software that reads or modifies the game.</li>
+        <li><b>It steps aside for fullscreen games.</b> While a fullscreen app or game is in front on the Ghost's
+          monitor, the whole overlay is hidden and stops rendering. This is on by default (Settings → "Hide during
+          fullscreen games and videos"), and it also avoids the frame-rate and input-lag cost of any window sitting
+          on top of a fullscreen game.</li>
+      </ul>
+      <div class="warn">
+        <b>Playing in a window? The Ghost can wander across your game.</b>
+        Auto-hide only triggers for apps that cover the whole monitor. If you play <b>windowed</b> or
+        <b>windowed-borderless at less than full screen</b>, the Ghost can drift over the game window, which may be
+        distracting during play. Turn the Ghost off from the Ghost tab or the tray icon before you play that way,
+        or move it to another monitor in Settings.
+      </div>
+      <p class="small">No game company guarantees anything about third-party programs, and policies change. If you
+        play in tournaments or organised competition, follow that event's rules about what may run on your PC.</p>
+
+      <h2>Terms of use</h2>
+      <p class="small">Plain-language terms for a free clan tool. Using DeskGhost means you accept them.</p>
+      <ol>
+        <li><b>Free and non-commercial.</b> DeskGhost is given away at no charge. You may share the installer
+          unchanged. It may not be sold, bundled into a paid product, or used to make money in any form,
+          including donations tied to it — Bungie's rules for fan projects require this.</li>
+        <li><b>No warranty.</b> It is provided "as is", without any warranty of any kind. It may have bugs, may
+          stop working when Bungie changes their content, and may be discontinued at any time.</li>
+        <li><b>Limitation of liability.</b> To the fullest extent the law allows, the authors are not liable for
+          any loss or damage arising from using DeskGhost — including lost game time, game account penalties,
+          performance problems, or data loss.</li>
+        <li><b>Your game account is your responsibility.</b> You are responsible for following the rules of any
+          game you play, including Bungie's Terms of Service, Code of Conduct and licence agreement. DeskGhost is
+          designed not to interfere with games (see above), but the risk of running any third-party software
+          alongside a game is yours.</li>
+        <li><b>Not affiliated with Bungie.</b> DeskGhost is an unofficial fan project. It is not made, endorsed,
+          sponsored or supported by Bungie, Inc. Destiny, Destiny 2, Bungie and all related names, marks, artwork
+          and game content are the property of Bungie, Inc.</li>
+        <li><b>Game content stays Bungie's.</b> No Bungie files are included in this program. Shell models,
+          textures and icons are downloaded from Bungie's public content servers onto your own PC when you choose
+          them, and remain Bungie's intellectual property. They are shown to you here for personal, non-commercial
+          use, and you may not redistribute them from this app.</li>
+        <li><b>Your data.</b> DeskGhost stores only your settings and the downloaded game files, on your PC. It
+          collects nothing about you and sends nothing anywhere. Its only outbound connections are requests for
+          public files from bungie.net and, unless you switch it off in Settings, a request to GitHub asking
+          whether a newer version exists.</li>
+        <li><b>Updates.</b> Updates are offered, never forced: DeskGhost will not download or install a new
+          version without you pressing the button, and automatic checking can be turned off. Updates are signed
+          and verified before installing. There is no obligation on anyone to provide updates, support or fixes,
+          and an update may change how the program works or what these terms say.</li>
+        <li><b>Links to other sites.</b> The Website and Discord buttons open sickontuesdays.com and a Discord
+          invite in your browser. Those sites are run separately and have their own terms and privacy practices,
+          and Discord has its own age and conduct rules.</li>
+        <li><b>Removing it.</b> Uninstall from Windows Settings → Apps. The uninstaller offers to delete the
+          downloaded files and settings too, and removes its "start with Windows" entry if you enabled it.</li>
+        <li><b>Changes.</b> Later versions may change these terms; the version you have is the version that
+          applies to it.</li>
+      </ol>
+
+      <h2>Built with</h2>
+      <p class="small">Tauri (MIT / Apache-2.0) · Rust and its crates · Microsoft WebView2 (part of Windows) ·
+        three.js (MIT) · fflate (MIT). Shell rendering is a port of the Sick on Tuesdays Guardian Command Center
+        web renderer, which reproduces Destiny's gear shading from Bungie's public data.</p>
+
+      <h2>References</h2>
+      <p class="small mono">Bungie — banning policies: safety.bungie.net/hc/en-us/articles/42308518654100<br>
+        Bungie Help — third-party application compatibility: help.bungie.net/hc/en-us/articles/360049199891<br>
+        Bungie Help — intellectual property and trademarks: help.bungie.net/hc/en-us/articles/360049201911<br>
+        BattlEye FAQ: battleye.com/support/faq/</p>
+      <p class="small">These notes are a plain-language summary written by the authors, not legal advice.</p>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

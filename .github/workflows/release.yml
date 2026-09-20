@@ -1,0 +1,55 @@
+name: Release
+
+# Builds the installer, signs the update, and publishes a GitHub release.
+#
+# To ship a version:
+#   1. bump "version" in package.json, src-tauri/tauri.conf.json and src-tauri/Cargo.toml (all three must match)
+#   2. add the notes to CHANGELOG.md
+#   3. git tag v0.3.0 && git push origin v0.3.0
+#
+# The release is created as a DRAFT so the notes can be edited. Installed copies only see the new version once
+# the release is published — publishing it is what actually ships the update.
+#
+# Secrets this needs (Settings → Secrets and variables → Actions):
+#   TAURI_SIGNING_PRIVATE_KEY           contents of %USERPROFILE%\.tauri\deskghost.key
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  the password that key was generated with
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: DeskGhost ${{ github.ref_name }}
+          releaseBody: 'See CHANGELOG.md for what changed. Download the .exe below and run it.'
+          releaseDraft: true
+          prerelease: false
+          # writes latest.json next to the installer — this is the file installed copies read
+          includeUpdaterJson: true
