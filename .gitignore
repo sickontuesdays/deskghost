@@ -11,3 +11,6 @@ src-tauri/gen/
 # Local verbatim snapshot of the website's js/ghost files, kept only for diffing when the site changes.
 # Not needed to build; src/ghost/ holds the ported versions that actually ship.
 reference/
+
+# Installers pulled down from a release for local testing.
+dist/
