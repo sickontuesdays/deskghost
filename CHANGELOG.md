@@ -1,5 +1,15 @@
 # DeskGhost changelog
 
+## 0.3.1 — 2026-09-20
+
+A check that updating actually works, end to end.
+
+There are no changes to the program itself. 0.3.0 was the first version able to update itself, and the only
+honest way to confirm that machinery works — the check, the offer, the signature check, the install, and your
+settings and downloaded shells surviving it — is to publish a real version and take the update.
+
+If you are reading this in the update card inside DeskGhost, most of it already worked.
+
 ## 0.3.0 — 2026-09-20
 
 DeskGhost can now tell you when a new version is out, so a copy you downloaded once doesn't go stale.

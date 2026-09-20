@@ -1,6 +1,6 @@
 [package]
 name = "deskghost"
-version = "0.3.0"
+version = "0.3.1"
 description = "A Destiny 2 Ghost that lives on your Windows desktop"
 edition = "2021"
 
